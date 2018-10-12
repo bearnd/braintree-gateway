@@ -1,0 +1,12 @@
+urllib3==1.22
+pyasn1==0.3.7
+pyOpenSSL==17.3.0
+ndg-httpsclient==0.4.3
+colorlog==3.1.0
+decorator==4.1.2
+validictory==1.1.1
+attrdict==2.0.0
+falcon==1.4.1
+braintree==3.49.0
+marshmallow==2.15.6
+falcon-marshmallow==0.2.0
