@@ -11,6 +11,9 @@ class SchemaPingResponse(marshmallow.Schema):
 
     status = marshmallow.fields.String(required=True)
 
+    class Meta:
+        strict = True
+
 
 class ResourcePing(ResourceBase):
     """Resource-class to perform ping-requests."""
