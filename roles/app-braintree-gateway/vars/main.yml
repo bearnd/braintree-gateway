@@ -1,0 +1,103 @@
+---
+
+# Braintree variables
+
+# Define the encrypted Braintree variables outside the nested structures due
+# to the issue described in https://stackoverflow
+# .com/questions/50770524/ansible-vault-inline-variable-with-to-nice-json
+# -unexpected-templating-type-erro
+bt_sandbox_merchant_id: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          31613863396362363536383537343236353265323739633030313238396334333766393735376235
+          6538623637663630336562306230363835346230373865610a636433393536636336353039636230
+          63343038373261393064623232653334303431376362393466346530396139656333343461363661
+          6361373366663534630a386463316636323636663534626634636337393631363962383965373665
+          31383162303062623661323532303730383566316465383166623230643036626665
+bt_sandbox_public_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38306232353165383433663239303438613331313566663138616565653066313964643234616531
+          3861656265323736396438333231663830656335343338310a616238373339623765653063646538
+          31623937613538323237303164643132613538343236643730326530383563316363336539636633
+          6261626362616436330a343765633161333135306535613438636133616432313231383566303334
+          37663262386463306534643839656434663363363661326637396363356235626439
+bt_sandbox_private_key: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          66333763333137373734323239366132313638336637316139623637643433353033613339666263
+          3164626438613931376338656233303366373166633933630a656663386265383161663634393837
+          32646633396130316263376138373964386132376535386339393862663632346366663032363337
+          3962376533336130300a363461323535343132663265366363653464366536613663666435386564
+          37636362333030633232616266333864626136386437366530386534356335373466626637323630
+          3135663463613736353062373863333138366434333633373735
+
+
+project:
+  name: "braintree-gateway"
+
+system:
+  # User name.
+  user: "braintree_gateway"
+  # User group.
+  group: "braintree_gateway"
+  # Application directories.
+  directories:
+    config: "/etc/{{ project.name }}"
+    share: "/usr/local/share/{{ project.name }}"
+    run: "/var/run/{{ project.name }}"
+    log: "/var/log/{{ project.name }}"
+    virtual_env: "/usr/local/share/{{ project.name }}/venvs/{{ project.name }}"
+
+# Application Configuration Settings.
+config:
+  test:
+    # General Settings.
+    logger_level: DEBUG
+
+    # Braintree configuration settings.
+    braintree:
+      environment: "sandbox"
+      merchant_id: "gpjybdgmqs3y7x5t"
+      public_key: "63jxck75t59yc8b7"
+      private_key: "8b49e38602bace3d11ceb18edbaf52c2"
+
+    # Gunicorn Configuration Settings.
+    gunicorn:
+      host: "0.0.0.0"
+      port: 8080
+      workers: 1
+      worker_class: sync
+
+  dev:
+    # General Settings.
+    logger_level: DEBUG
+
+    # Braintree configuration settings.
+    braintree:
+      environment: "sandbox"
+      merchant_id: "{{ bt_sandbox_merchant_id }}"
+      public_key: "{{ bt_sandbox_public_key }}"
+      private_key: "{{ bt_sandbox_private_key }}"
+
+    # Gunicorn Configuration Settings.
+    gunicorn:
+      host: "0.0.0.0"
+      port: 8080
+      workers: 1
+      worker_class: sync
+
+  prod:
+    # General Settings.
+    logger_level: INFO
+
+    # Braintree configuration settings.
+    braintree:
+      environment: "production"
+      merchant_id:
+      public_key:
+      private_key:
+
+    # Gunicorn Configuration Settings.
+    gunicorn:
+      host: "0.0.0.0"
+      port: 8080
+      workers: 4
+      worker_class: sync
