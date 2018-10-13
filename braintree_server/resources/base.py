@@ -52,7 +52,7 @@ class ResourceBase(object):
             raise falcon.HTTPError(
                 status=falcon.HTTP_400,
                 title="InvalidRequest",
-                description=msg_fmt + ". Exception: {0}".format(str(exc))
+                description=msg_fmt,
             )
 
         try:
@@ -71,10 +71,10 @@ class ResourceBase(object):
             raise falcon.HTTPError(
                 status=falcon.HTTP_422,
                 title="Schema violation.",
-                description=msg_fmt + ". Exception: {0}".format(str(exc))
+                description=msg_fmt + " Exception: {0}".format(str(exc))
             )
         except Exception as exc:
-            msg_fmt = "Could not decode JSON body."
+            msg_fmt = "Could not decode JSON body '{}'.".format(request_json)
             self.logger.exception(msg_fmt)
             raise falcon.HTTPError(
                 status=falcon.HTTP_400,

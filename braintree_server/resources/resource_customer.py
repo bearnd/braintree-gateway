@@ -65,7 +65,7 @@ class ResourceCustomer(ResourceBase):
             raise falcon.HTTPError(
                 status=falcon.HTTP_404,
                 title="Not found.",
-                description=msg_fmt + ". Exception: {0}".format(str(exc))
+                description=msg_fmt,
             )
 
         result = {
@@ -173,7 +173,7 @@ class ResourceCustomer(ResourceBase):
             raise falcon.HTTPError(
                 status=falcon.HTTP_404,
                 title="Not found.",
-                description=msg_fmt + ". Exception: {0}".format(str(exc))
+                description=msg_fmt,
             )
 
         # Respond with a 409 if the customer could not be deleted.
