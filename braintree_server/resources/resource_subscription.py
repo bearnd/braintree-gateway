@@ -144,9 +144,6 @@ class ResourceSubscription(ResourceBase):
         pm_result = self.gateway.payment_method.create(params={
             "customer_id": customer_id,
             "payment_method_nonce": parameters["payment_method_nonce"],
-            "options": {
-                "make_default": True,
-            },
         })
 
         # Respond with a 409 if the payment-method could not be created.
