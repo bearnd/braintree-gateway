@@ -50,7 +50,7 @@ class ResourceCustomer(ResourceBase):
                 will be performed.
         """
 
-        msg = "Retrieving customer with ID '{}'"
+        msg = "Retrieving customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
@@ -102,7 +102,7 @@ class ResourceCustomer(ResourceBase):
         # Retrieve defined customer ID.
         customer_id = parameters["customer_id"]
 
-        msg = "Creating customer with ID '{}'"
+        msg = "Creating customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
@@ -157,6 +157,10 @@ class ResourceCustomer(ResourceBase):
             deleted, and all associated recurring billing subscriptions are
             cancelled.
         """
+
+        msg = "Deleting customer with ID '{}'."
+        msg_fmt = msg.format(customer_id)
+        self.logger.info(msg_fmt)
 
         # Delete customer or respond with a 404 if no customer was found for
         # the given ID.

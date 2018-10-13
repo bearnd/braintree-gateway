@@ -63,7 +63,7 @@ class ResourceSubscription(ResourceBase):
                 retrieval will be performed.
         """
 
-        msg = "Retrieving subscription with ID '{}'"
+        msg = "Retrieving subscription with ID '{}'."
         msg_fmt = msg.format(subscription_id)
         self.logger.info(msg_fmt)
 
@@ -122,7 +122,7 @@ class ResourceSubscription(ResourceBase):
         # Retrieve the customer ID.
         customer_id = parameters["customer_id"]
 
-        msg = "Creating subscription for customer with ID '{}'"
+        msg = "Creating subscription for customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
@@ -212,7 +212,7 @@ class ResourceSubscription(ResourceBase):
                 cancellation will be performed.
         """
 
-        msg = "Deleting subscription with ID '{}'"
+        msg = "Deleting subscription with ID '{}'."
         msg_fmt = msg.format(subscription_id)
         self.logger.info(msg_fmt)
 
