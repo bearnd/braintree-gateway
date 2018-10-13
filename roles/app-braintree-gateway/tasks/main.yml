@@ -131,6 +131,17 @@
   become_user: "{{ system.user }}"
   when: is_vagrant is not defined or is_vagrant == False
 
+- name: Create `dev` Gunicorn configuration file (Vagrant).
+  template:
+    src: "gunicorn_config.py.j2"
+    dest: "{{ system.directories.config }}/gunicorn-config-dev.py"
+    owner: "{{ system.user }}"
+    group: "{{ system.group }}"
+    mode: 0600
+  become: true
+  become_user: "{{ system.user }}"
+  when: is_vagrant is defined and is_vagrant == True
+
 - name: Install development-only Python package requirements (Vagrant).
   pip:
     chdir: "/home/vagrant/{{ project.name }}"

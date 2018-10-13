@@ -64,7 +64,9 @@ config:
       host: "0.0.0.0"
       port: 8080
       workers: 1
+      threads: 4
       worker_class: sync
+      timeout: 60
 
   dev:
     # General Settings.
@@ -82,7 +84,9 @@ config:
       host: "0.0.0.0"
       port: 8080
       workers: 1
+      threads: 4
       worker_class: sync
+      timeout: 60
 
   prod:
     # General Settings.
@@ -100,4 +104,6 @@ config:
       host: "0.0.0.0"
       port: 8080
       workers: 4
+      threads: 4
       worker_class: sync
+      timeout: 60
