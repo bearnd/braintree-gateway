@@ -133,14 +133,25 @@
 
 - name: Create `dev` Gunicorn configuration file (Vagrant).
   template:
-    src: "gunicorn_config.py.j2"
-    dest: "{{ system.directories.config }}/gunicorn-config-dev.py"
+    src: "gunicorn_config_dev.py.j2"
+    dest: "{{ system.directories.config }}/gunicorn_config.py"
     owner: "{{ system.user }}"
     group: "{{ system.group }}"
     mode: 0600
   become: true
   become_user: "{{ system.user }}"
   when: is_vagrant is defined and is_vagrant == True
+
+- name: Create `prod` Gunicorn configuration file (Production).
+  template:
+    src: "gunicorn_config_prod.py.j2"
+    dest: "{{ system.directories.config }}/gunicorn_config.py"
+    owner: "{{ system.user }}"
+    group: "{{ system.group }}"
+    mode: 0600
+  become: true
+  become_user: "{{ system.user }}"
+  when: is_vagrant is not defined or is_vagrant == False
 
 - name: Install development-only Python package requirements (Vagrant).
   pip:
@@ -160,6 +171,28 @@
     state: latest
     virtualenv: "{{ system.directories.virtual_env }}"
     virtualenv_python: python3.5
+  become: true
+  become_user: "{{ system.user }}"
+  when: is_vagrant is not defined or is_vagrant == False
+
+- name: Create systemd `prod` service file (Production).
+  template:
+    src: "braintree-gateway.service.j2"
+    dest: "/etc/systemd/system/{{ project.name }}.service"
+    owner: "{{ system.user }}"
+    group: "{{ system.group }}"
+    mode: 0600
+  become: true
+  become_user: "{{ system.user }}"
+  when: is_vagrant is not defined or is_vagrant == False
+
+- name: Restart `braintree-gateway`, in all cases, also issue daemon-reload to
+        pick up config changes.
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: braintree-gateway
+    enabled: true
   become: true
   become_user: "{{ system.user }}"
   when: is_vagrant is not defined or is_vagrant == False
