@@ -43,19 +43,19 @@ def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
     # Add the route used to ping the service.
     api.add_route(
         uri_template="/ping",
-        resource=ResourcePing(gateway=gateway, logger_level=logger_level)
+        resource=ResourcePing(gateway=gateway, logger_level=logger_level),
     )
 
     # Add the route used to retrieve (GET) or delete (DELETE) customers.
     api.add_route(
         uri_template="/customer/{customer_id}",
-        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level)
+        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level),
     )
 
     # Add the route used to create (POST) customers.
     api.add_route(
         uri_template="/customer",
-        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level)
+        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level),
     )
 
     # Add the route used to retrieve (GET) or delete (DELETE) subscriptions.
@@ -64,7 +64,7 @@ def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
         resource=ResourceSubscription(
             gateway=gateway,
             logger_level=logger_level,
-        )
+        ),
     )
 
     # Add the route used to create (POST) subscriptions.
