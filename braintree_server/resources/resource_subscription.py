@@ -1,10 +1,11 @@
 # coding=utf-8
 
 import falcon
-import marshmallow.validate
+import marshmallow
 import braintree.exceptions
 
 from braintree_server.resources.base import ResourceBase
+from braintree_server.resources.schemata import SchemaSubscription
 
 
 class SchemaSubscriptionPostRequest(marshmallow.Schema):
@@ -18,35 +19,11 @@ class SchemaSubscriptionPostRequest(marshmallow.Schema):
         strict = True
 
 
-class SchemaSubscriptionResponse(marshmallow.Schema):
-    """Braintree subscription schema used in responses."""
-
-    subscription_id = marshmallow.fields.String(required=True)
-    plan_id = marshmallow.fields.String(required=True)
-    status = marshmallow.fields.String(
-        required=True,
-        validate=marshmallow.validate.OneOf(choices=[
-            "Active",
-            "Canceled",
-            "Expired",
-            "Past Due",
-            "Pending",
-        ])
-    )
-    balance = marshmallow.fields.Decimal(required=False, as_string=True)
-    billing_day_of_month = marshmallow.fields.Integer(required=False)
-    created_at = marshmallow.fields.DateTime(required=False)
-    updated_at = marshmallow.fields.DateTime(required=False)
-
-    class Meta:
-        strict = True
-
-
 class ResourceSubscription(ResourceBase):
     """ Resource-class to manage Braintree subscriptions."""
 
     schema_post_request = SchemaSubscriptionPostRequest()
-    schema_response = SchemaSubscriptionResponse()
+    schema_response = SchemaSubscription()
 
     def on_get(
         self,
@@ -73,7 +50,7 @@ class ResourceSubscription(ResourceBase):
             subscription = self.gateway.subscription.find(
                 subscription_id=subscription_id,
             )
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg = "Subscription with ID '{}' not found."
             msg_fmt = msg.format(subscription_id)
             self.logger.exception(msg_fmt)
@@ -84,19 +61,9 @@ class ResourceSubscription(ResourceBase):
                 description=msg_fmt,
             )
 
-        result = {
-            "subscription_id": subscription.id,
-            "plan_id": subscription.plan_id,
-            "status": subscription.status,
-            "balance": subscription.balance,
-            "billing_day_of_month": subscription.billing_day_of_month,
-            "created_at": subscription.created_at,
-            "updated_at": subscription.updated_at,
-        }
-
         resp = self.prepare_response(
             resp=resp,
-            result=result,
+            result=subscription,
             schema=self.schema_response,
         )
         resp.status = falcon.HTTP_200
@@ -130,7 +97,7 @@ class ResourceSubscription(ResourceBase):
         # the given ID.
         try:
             self.gateway.customer.find(customer_id=customer_id)
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg_fmt = "Customer with ID '{}' not found.".format(customer_id)
             self.logger.exception(msg_fmt)
 
@@ -144,6 +111,9 @@ class ResourceSubscription(ResourceBase):
         pm_result = self.gateway.payment_method.create(params={
             "customer_id": customer_id,
             "payment_method_nonce": parameters["payment_method_nonce"],
+            "options": {
+                "verify_card": True,
+            }
         })
 
         # Respond with a 409 if the payment-method could not be created.
@@ -177,19 +147,9 @@ class ResourceSubscription(ResourceBase):
                 description=msg_fmt,
             )
 
-        result = {
-            "subscription_id": result.subscription.id,
-            "plan_id": result.subscription.plan_id,
-            "status": result.subscription.status,
-            "balance": result.subscription.balance,
-            "billing_day_of_month": result.subscription.billing_day_of_month,
-            "created_at": result.subscription.created_at,
-            "updated_at": result.subscription.updated_at,
-        }
-
         resp = self.prepare_response(
             resp=resp,
-            result=result,
+            result=result.subscription,
             schema=self.schema_response,
         )
         resp.status = falcon.HTTP_201
@@ -219,7 +179,7 @@ class ResourceSubscription(ResourceBase):
             result = self.gateway.subscription.cancel(
                 subscription_id=subscription_id,
             )
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg = "Subscription with ID '{}' not found."
             msg_fmt = msg.format(subscription_id)
             self.logger.exception(msg_fmt)
