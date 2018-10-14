@@ -41,9 +41,44 @@ class ResourceClientToken(ResourceBase):
         self.logger.info(msg_fmt)
 
         # Generate client-token.
-        token = self.gateway.client_token.generate({
-            "customer_id": customer_id,
-        })
+        try:
+            token = self.gateway.client_token.generate({
+                "customer_id": customer_id,
+            })
+        except ValueError:
+            msg = "Customer with ID '{}' not found."
+            msg_fmt = msg.format(customer_id)
+            self.logger.exception(msg_fmt)
+
+            raise falcon.HTTPError(
+                status=falcon.HTTP_404,
+                title="Not found.",
+                description=msg_fmt,
+            )
+
+        resp = self.prepare_response(
+            resp=resp,
+            result={"token": token},
+            schema=self.schema,
+        )
+        resp.status = falcon.HTTP_200
+
+
+class ResourceClientTokenNoCustomerId(ResourceBase):
+    """Resource-class to manage Braintree client-tokens."""
+
+    schema = SchemaClientToken()
+
+    def on_get(
+        self,
+        req: falcon.Request,
+        resp: falcon.Response,
+    ):
+        msg_fmt = "Generating customer-token."
+        self.logger.info(msg_fmt)
+
+        # Generate client-token.
+        token = self.gateway.client_token.generate()
 
         resp = self.prepare_response(
             resp=resp,

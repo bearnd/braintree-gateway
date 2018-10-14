@@ -5,6 +5,7 @@ import marshmallow
 import braintree.exceptions
 
 from braintree_server.resources.base import ResourceBase
+from braintree_server.resources.schemata import SchemaCustomer
 
 
 class SchemaCustomerPostRequest(marshmallow.Schema):
@@ -17,23 +18,11 @@ class SchemaCustomerPostRequest(marshmallow.Schema):
         strict = True
 
 
-class SchemaCustomerResponse(marshmallow.Schema):
-    """Braintree customer schema used in responses."""
-
-    customer_id = marshmallow.fields.String(required=True)
-    email = marshmallow.fields.String(required=True)
-    created_at = marshmallow.fields.DateTime(required=False)
-    updated_at = marshmallow.fields.DateTime(required=False)
-
-    class Meta:
-        strict = True
-
-
 class ResourceCustomer(ResourceBase):
     """Resource-class to manage Braintree customers."""
 
     schema_post_request = SchemaCustomerPostRequest()
-    schema_response = SchemaCustomerResponse()
+    schema_response = SchemaCustomer()
 
     def on_get(
         self,
@@ -68,16 +57,9 @@ class ResourceCustomer(ResourceBase):
                 description=msg_fmt,
             )
 
-        result = {
-            "customer_id": customer.id,
-            "email": customer.email,
-            "created_at": customer.created_at,
-            "updated_at": customer.updated_at,
-        }
-
         resp = self.prepare_response(
             resp=resp,
-            result=result,
+            result=customer,
             schema=self.schema_response,
         )
         resp.status = falcon.HTTP_200
@@ -124,16 +106,9 @@ class ResourceCustomer(ResourceBase):
                 description=msg_fmt,
             )
 
-        result = {
-            "customer_id": result.customer.id,
-            "email": result.customer.email,
-            "created_at": result.customer.created_at,
-            "updated_at": result.customer.updated_at,
-        }
-
         resp = self.prepare_response(
             resp=resp,
-            result=result,
+            result=result.customer,
             schema=self.schema_response,
         )
         resp.status = falcon.HTTP_201
