@@ -63,6 +63,23 @@ class ResourceClientToken(ResourceBase):
         )
         resp.status = falcon.HTTP_200
 
+
+class ResourceClientTokenNoCustomerId(ResourceBase):
+    """Resource-class to manage Braintree client-tokens."""
+
+    schema = SchemaClientToken()
+
+    def on_get(
+        self,
+        req: falcon.Request,
+        resp: falcon.Response,
+    ):
+        msg_fmt = "Generating customer-token."
+        self.logger.info(msg_fmt)
+
+        # Generate client-token.
+        token = self.gateway.client_token.generate()
+
         resp = self.prepare_response(
             resp=resp,
             result={"token": token},

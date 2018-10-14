@@ -11,6 +11,7 @@ from braintree_server.resources.resource_subscription import (
     ResourceSubscription
 )
 from braintree_server.resources.resource_client_token import ResourceClientToken
+from braintree_server.resources.resource_client_token import ResourceClientTokenNoCustomerId
 
 
 def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
@@ -76,10 +77,22 @@ def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
         )
     )
 
-    # Add the route used to retrieve (GET) client-tokens.
+    # Add the route used to retrieve (GET) client-tokens without a customer ID.
+    api.add_route(
+        uri_template="/client-token",
+        resource=ResourceClientTokenNoCustomerId(
+            gateway=gateway,
+            logger_level=logger_level,
+        ),
+    )
+
+    # Add the route used to retrieve (GET) client-tokens with a customer ID.
     api.add_route(
         uri_template="/client-token/{customer_id}",
-        resource=ResourceClientToken(gateway=gateway, logger_level=logger_level)
+        resource=ResourceClientToken(
+            gateway=gateway,
+            logger_level=logger_level,
+        ),
     )
 
     msg_fmt = u"API initialization complete."
