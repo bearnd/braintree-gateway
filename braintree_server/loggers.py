@@ -18,7 +18,7 @@ import colorlog
 def create_logger(
         logger_name,
         logger_level="DEBUG",
-        project_name="fightfor-graphql",
+        project_name="braintree-gateway",
         do_log_stdout=True,
         do_log_syslog=True,
         do_color_logs=True,
