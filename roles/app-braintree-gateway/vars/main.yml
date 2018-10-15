@@ -94,10 +94,10 @@ config:
 
     # Braintree configuration settings.
     braintree:
-      environment: "production"
-      merchant_id:
-      public_key:
-      private_key:
+      environment: "sandbox"
+      merchant_id: "{{ bt_sandbox_merchant_id }}"
+      public_key: "{{ bt_sandbox_public_key }}"
+      private_key: "{{ bt_sandbox_private_key }}"
 
     # Gunicorn Configuration Settings.
     gunicorn:
