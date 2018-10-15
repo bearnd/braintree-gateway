@@ -183,7 +183,6 @@
     group: "{{ system.group }}"
     mode: 0600
   become: true
-  become_user: "{{ system.user }}"
   when: is_vagrant is not defined or is_vagrant == False
 
 - name: Restart `braintree-gateway`, in all cases, also issue daemon-reload to
@@ -194,5 +193,4 @@
     name: braintree-gateway
     enabled: true
   become: true
-  become_user: "{{ system.user }}"
   when: is_vagrant is not defined or is_vagrant == False
