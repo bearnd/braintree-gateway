@@ -47,7 +47,7 @@ class ResourceCustomer(ResourceBase):
         # the given ID.
         try:
             customer = self.gateway.customer.find(customer_id=customer_id)
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg_fmt = "Customer with ID '{}' not found.".format(customer_id)
             self.logger.exception(msg_fmt)
 
@@ -141,7 +141,7 @@ class ResourceCustomer(ResourceBase):
         # the given ID.
         try:
             result = self.gateway.customer.delete(customer_id=customer_id)
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg_fmt = "Customer with ID '{}' not found.".format(customer_id)
             self.logger.exception(msg_fmt)
 
