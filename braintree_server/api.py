@@ -1,27 +1,31 @@
 # coding=utf-8
 
+import attrdict
 import falcon
 import braintree
 
 from braintree_server.loggers import create_logger
-
+from braintree_server.middlewares.auth0 import MiddlewareAuth0
 from braintree_server.resources.resource_ping import ResourcePing
 from braintree_server.resources.resource_customer import ResourceCustomer
 from braintree_server.resources.resource_subscription import (
     ResourceSubscription
 )
 from braintree_server.resources.resource_client_token import ResourceClientToken
-from braintree_server.resources.resource_client_token import ResourceClientTokenNoCustomerId
+from braintree_server.resources.resource_client_token import (
+    ResourceClientTokenNoCustomerId
+)
 
 
-def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
-    """ Creates a Falcon API and adds resources for the GraphQL and GraphiQL
-        endpoints.
+def create_api(
+    cfg: attrdict.AttrDict,
+    logger_level: str
+):
+    """ Creates a Falcon API and adds resources the different endpoints.
 
     Args:
-        gateway (braintree.BraintreeGateway): The instantiated and
-            configured Braintree gateway that will be used to interact with
-            Braintree.
+        cfg (attrdict.Attrdict): The application configuration loaded with the
+            methods under the `config.py` module.
         logger_level (str): The logger level to be set in the Falcon resource
             classes.
 
@@ -35,8 +39,29 @@ def create_api(gateway: braintree.BraintreeGateway, logger_level: str):
         logger_level=logger_level
     )
 
+    gateway = braintree.BraintreeGateway(
+        braintree.Configuration(
+            environment=cfg.braintree.environment,
+            merchant_id=cfg.braintree.merchant_id,
+            public_key=cfg.braintree.public_key,
+            private_key=cfg.braintree.private_key,
+        )
+    )
+
     # Create the API.
-    api = falcon.API()
+    api = falcon.API(
+        middleware=[
+            MiddlewareAuth0(
+                auth0_domain=cfg.auth0.domain,
+                auth0_audience=cfg.auth0.audience,
+                auth0_jwks_url=cfg.auth0.jwks_url,
+                exlcude=[
+                    "/ping",
+                ],
+                logger_level=logger_level,
+            ),
+        ]
+    )
 
     msg_fmt = u"Initializing API resources."
     logger.info(msg_fmt)
