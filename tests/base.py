@@ -1,6 +1,5 @@
 # coding=utf-8
 
-import braintree
 from falcon import testing
 
 from braintree_server.config import import_config
@@ -13,34 +12,8 @@ fname_config_file = "/etc/braintree-gateway/braintree-gateway-test.json"
 cfg = import_config(fname_config_file=fname_config_file)
 
 # Singleton placeholders.
-_gateway = None
 _token_generator = None
 _app = None
-
-
-def _get_gateway() -> braintree.BraintreeGateway:
-    """Returns an instance of `BraintreeGateway` configured for unit-testing.
-
-    Returns:
-        braintree.BraintreeGateway: The `braintree.BraintreeGateway` instance
-            configured for unit-testing.
-    """
-
-    global _gateway
-
-    # If the gateway has not been previously instantiated then do so with the
-    # unit-test configuration.
-    if not _gateway:
-        _gateway = braintree.BraintreeGateway(
-            braintree.Configuration(
-                environment=cfg.braintree.environment,
-                merchant_id=cfg.braintree.merchant_id,
-                public_key=cfg.braintree.public_key,
-                private_key=cfg.braintree.private_key,
-            )
-        )
-
-    return _gateway
 
 
 def _get_token_generator():
@@ -91,14 +64,22 @@ class TestBase(testing.TestCase):
     def setUp(self):
         super(TestBase, self).setUp()
 
-        self.gateway = _get_gateway()
+        # Retrieve the `JwtTokenGenerator` singleton.
         self.token_generator = _get_token_generator()
 
+        # Retrieve the `falcon.API` singleton.
         self.app = _get_app()
 
     def generate_jwt_headers(self):
+        """ Generates headers with a populated `Authorization` header.
 
+        Returns:
+            dict: The generated headers.
+        """
+
+        # Generate an access-token.
         token = self.token_generator.generate()
+
         headers = {
             "Authorization": "Bearer {}".format(token),
         }
