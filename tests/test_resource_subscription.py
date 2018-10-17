@@ -4,219 +4,203 @@
 This module defines unit-tests for the `ResourceSubscription` class.
 """
 
-import uuid
+import decimal
 import json
+import unittest.mock
+
+import braintree.exceptions
+import falcon.testing
 
 from tests.base import TestBase
+from tests import fixtures
 
 
 class TestResourceSubscription(TestBase):
-    """Tests the `ResourceSubscription` class."""
+    """ Tests the `ResourceSubscription` class."""
 
     def test_get(self):
-        """ Tests the `on_get` method by creating a new subscription via the
-            gateway and retrieving that subscription via the API."""
+        """ Tests the `on_get` method."""
 
-        # Create a new customer via the Braintree gateway.
-        customer_id = uuid.uuid4().hex
-        email = "fake@email.com"
-        result = self.gateway.customer.create(params={
-            "id": customer_id,
-            "email": email,
-        })
-
-        # Assert that the customer was created.
-        self.assertTrue(result.is_success)
-
-        # Create a new payment-method for the customer via the Braintree
-        # gateway.
-        payment_method_nonce = "fake-valid-visa-nonce"
-        result = self.gateway.payment_method.create(params={
-            "customer_id": customer_id,
-            "payment_method_nonce": payment_method_nonce,
-        })
-
-        # Assert that the payment-method was created.
-        self.assertTrue(result.is_success)
-
-        # Create a new subscription via the Braintree gateway.
-        plan_id = "test"
-        result = self.gateway.subscription.create(params={
-            "payment_method_token": result.payment_method.token,
-            "plan_id": plan_id,
-        })
-
-        # Assert that the payment-method was created.
-        self.assertTrue(result.is_success)
-
-        # Retrieve the newly created subscription's ID.
-        subscription_id = result.subscription.id
-
-        # Retrieve the newly created subscription via the API.
-        response = self.simulate_get("/subscription/{}".format(
-            subscription_id,
-        ))
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.find",
+            new=staticmethod(lambda subscription_id: fixtures.subscription),
+        ):
+            response = self.simulate_get(
+                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                headers=self.generate_jwt_headers(),
+            )  # type: falcon.testing.Result
 
         # Assert that the request was successful.
         self.assertEqual(response.status_code, 200)
 
         # Assert that the subscriptions's details match the provided parameters.
-        self.assertEqual(response.json["subscription_id"], subscription_id)
-        self.assertEqual(response.json["plan_id"], plan_id)
-        self.assertEqual(response.json["status"], "Active")
-        self.assertEqual(response.json["balance"], "0.00")
-
-        # Delete the customer via the gateway to minimize sandbox contamination.
-        # This deletion will cancel the subscription and delete the payment
-        # method.
-        result = self.gateway.customer.delete(customer_id=customer_id)
-
-        # Assert that the customer was deleted.
-        self.assertTrue(result.is_success)
+        self.assertEqual(response.json["id"], fixtures.SUBSCRIPTION_ID)
+        self.assertEqual(response.json["plan_id"], fixtures.PLAN_ID)
+        self.assertEqual(response.json["status"], fixtures.SUBSCRIPTION_STATUS)
+        self.assertEqual(
+            decimal.Decimal(response.json["balance"]),
+            fixtures.SUBSCRIPTION_BALANCE,
+        )
 
     def test_get_404(self):
-        """ Tests the `on_get` method by retrieving a non-existent
-            subscription.
-        """
+        """ Tests the `on_get` method simulating a 404 response."""
 
-        subscription_id = uuid.uuid4().hex
-
-        # Retrieve a non-existent subscription via the API.
-        response = self.simulate_get("/subscription/{}".format(subscription_id))
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.find",
+            side_effect=braintree.exceptions.NotFoundError,
+        ):
+            response = self.simulate_get(
+                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                headers=self.generate_jwt_headers(),
+            )
 
         # Assert that the request failed with a 404.
         self.assertEqual(response.status_code, 404)
 
+    @unittest.mock.patch(
+        target="braintree.customer_gateway.CustomerGateway.find",
+        new=staticmethod(lambda customer_id: fixtures.customer),
+    )
+    @unittest.mock.patch(
+        target="braintree.payment_method_gateway.PaymentMethodGateway.create",
+        new=staticmethod(lambda params: fixtures.result_payment_method_success),
+    )
     def test_post(self):
-        """ Tests the `on_post` method by creating a new subscription via the
-            API.
-        """
+        """ Tests the `on_post` method."""
 
-        # Create a new customer via the Braintree gateway.
-        customer_id = uuid.uuid4().hex
-        email = "fake@email.com"
-        result = self.gateway.customer.create(params={
-            "id": customer_id,
-            "email": email,
-        })
-
-        # Assert that the customer was created.
-        self.assertTrue(result.is_success)
-
-        # Create a new subscription via the Braintree API.
-        plan_id = "test"
-        response = self.simulate_post(
-            path="/subscription",
-            body=json.dumps({
-                "payment_method_nonce": "fake-valid-amex-nonce",
-                "customer_id": customer_id,
-                "plan_id": plan_id,
-            }),
-        )
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.create",
+            new=staticmethod(
+                lambda params: fixtures.result_subscription_success
+            ),
+        ):
+            response = self.simulate_post(
+                path="/subscription",
+                body=json.dumps({
+                    "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
+                    "customer_id": fixtures.CUSTOMER_ID,
+                    "plan_id": fixtures.PLAN_ID,
+                }),
+                headers=self.generate_jwt_headers(),
+            )
 
         # Assert that the request was successful.
         self.assertEqual(response.status_code, 201)
 
         # Assert that the subscriptions's details match the provided parameters.
-        self.assertEqual(response.json["plan_id"], plan_id)
-        self.assertEqual(response.json["status"], "Active")
-        self.assertEqual(response.json["balance"], "0.00")
-
-        # Delete the customer via the gateway to minimize sandbox contamination.
-        # This deletion will cancel the subscription and delete the payment
-        # method.
-        result = self.gateway.customer.delete(customer_id=customer_id)
-
-        # Assert that the customer was deleted.
-        self.assertTrue(result.is_success)
+        self.assertEqual(response.json["plan_id"], fixtures.PLAN_ID)
+        self.assertEqual(response.json["status"], fixtures.SUBSCRIPTION_STATUS)
+        self.assertEqual(
+            decimal.Decimal(response.json["balance"]),
+            fixtures.SUBSCRIPTION_BALANCE,
+        )
 
     def test_post_404_customer(self):
-        """ Tests the `on_post` method by creating a new subscription via the
-            API when the defined customer is non-existent.
+        """ Tests the `on_post` method simulating a 404 response on customer
+            retrieval.
         """
 
-        # Create a new customer via the Braintree gateway.
-        customer_id = uuid.uuid4().hex
-        # Create a new subscription via the Braintree API.
-        plan_id = "test"
-        response = self.simulate_post(
-            path="/subscription",
-            body=json.dumps({
-                "payment_method_nonce": "fake-valid-nonce",
-                "customer_id": customer_id,
-                "plan_id": plan_id,
-            }),
-        )
+        with unittest.mock.patch(
+            target="braintree.customer_gateway.CustomerGateway.find",
+            side_effect=braintree.exceptions.NotFoundError,
+        ):
+            response = self.simulate_post(
+                path="/subscription",
+                body=json.dumps({
+                    "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
+                    "customer_id": fixtures.CUSTOMER_ID,
+                    "plan_id": fixtures.PLAN_ID,
+                }),
+                headers=self.generate_jwt_headers(),
+            )
 
         # Assert that the request failed with a 404.
         self.assertEqual(response.status_code, 404)
 
+    @unittest.mock.patch(
+        target="braintree.customer_gateway.CustomerGateway.find",
+        new=staticmethod(lambda customer_id: fixtures.customer),
+    )
+    @unittest.mock.patch(
+        target="braintree.payment_method_gateway.PaymentMethodGateway.create",
+        new=staticmethod(lambda params: fixtures.result_payment_method_failure),
+    )
+    def test_post_409_payment_method(self):
+        """ Tests the `on_post` method simulating a 409 response on the
+            payment method creation.
+        """
+
+        response = self.simulate_post(
+            path="/subscription",
+            body=json.dumps({
+                "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
+                "customer_id": fixtures.CUSTOMER_ID,
+                "plan_id": fixtures.PLAN_ID,
+            }),
+            headers=self.generate_jwt_headers(),
+        )
+
+        # Assert that the request failed with a 409.
+        self.assertEqual(response.status_code, 409)
+
+    @unittest.mock.patch(
+        target="braintree.customer_gateway.CustomerGateway.find",
+        new=staticmethod(lambda customer_id: fixtures.customer),
+    )
+    @unittest.mock.patch(
+        target="braintree.payment_method_gateway.PaymentMethodGateway.create",
+        new=staticmethod(lambda params: fixtures.result_payment_method_success),
+    )
+    def test_post_409_subscription(self):
+        """ Tests the `on_post` method simulating a 409 response on the
+            subscription creation.
+        """
+
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.create",
+            new=staticmethod(
+                lambda params: fixtures.result_subscription_failure
+            ),
+        ):
+            response = self.simulate_post(
+                path="/subscription",
+                body=json.dumps({
+                    "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
+                    "customer_id": fixtures.CUSTOMER_ID,
+                    "plan_id": fixtures.PLAN_ID,
+                }),
+                headers=self.generate_jwt_headers(),
+            )
+
+        # Assert that the request failed with a 409.
+        self.assertEqual(response.status_code, 409)
+
     def test_delete(self):
-        """ Tests the `on_delete` method by creating a new subscription via the
-            gateway and deleting that subscription via the API."""
+        """ Tests the `on_delete` method."""
 
-        # Create a new customer via the Braintree gateway.
-        customer_id = uuid.uuid4().hex
-        email = "fake@email.com"
-        result = self.gateway.customer.create(params={
-            "id": customer_id,
-            "email": email,
-        })
-
-        # Assert that the customer was created.
-        self.assertTrue(result.is_success)
-
-        # Create a new payment-method for the customer via the Braintree
-        # gateway.
-        payment_method_nonce = "fake-valid-mastercard-nonce"
-        result = self.gateway.payment_method.create(params={
-            "customer_id": customer_id,
-            "payment_method_nonce": payment_method_nonce,
-        })
-
-        # Assert that the payment-method was created.
-        self.assertTrue(result.is_success)
-
-        # Create a new subscription via the Braintree gateway.
-        plan_id = "test"
-        result = self.gateway.subscription.create(params={
-            "payment_method_token": result.payment_method.token,
-            "plan_id": plan_id,
-        })
-
-        # Assert that the payment-method was created.
-        self.assertTrue(result.is_success)
-
-        # Retrieve the newly created subscription's ID.
-        subscription_id = result.subscription.id
-
-        # Delete the newly created subscription via the API.
-        response = self.simulate_delete("/subscription/{}".format(
-            subscription_id,
-        ))
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.cancel",
+            new=staticmethod(lambda subscription_id: fixtures.result_success),
+        ):
+            response = self.simulate_delete(
+                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                headers=self.generate_jwt_headers(),
+            )
 
         # Assert that the request was successful.
         self.assertEqual(response.status_code, 204)
 
-        # Delete the customer via the gateway to minimize sandbox contamination.
-        # This deletion will cancel the subscription and delete the payment
-        # method.
-        result = self.gateway.customer.delete(customer_id=customer_id)
-
-        # Assert that the customer was deleted.
-        self.assertTrue(result.is_success)
-
     def test_delete_404(self):
-        """ Tests the `on_delete` method by deleting a non-existent
-            subscription.
-        """
+        """ Tests the `on_delete` method simulating a 404 response."""
 
-        subscription_id = uuid.uuid4().hex
-
-        # Delete a non-existent subscription via the API.
-        response = self.simulate_delete(
-            "/subscription/{}".format(subscription_id),
-        )
+        with unittest.mock.patch(
+            target="braintree.subscription_gateway.SubscriptionGateway.cancel",
+            side_effect=braintree.exceptions.NotFoundError,
+        ):
+            response = self.simulate_delete(
+                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                headers=self.generate_jwt_headers(),
+            )
 
         # Assert that the request failed with a 404.
         self.assertEqual(response.status_code, 404)
