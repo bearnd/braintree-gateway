@@ -47,6 +47,10 @@ class ResourceSubscription(ResourceBase):
         msg_fmt = msg.format(subscription_id, customer_id)
         self.logger.info(msg_fmt)
 
+        # Check whether the caller is authorized to access resource pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
+
         # Retrieve subscription or respond with a 404 if no subscription was
         # found for the given ID.
         try:
@@ -95,6 +99,10 @@ class ResourceSubscription(ResourceBase):
         msg = "Creating subscription for customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
+
+        # Check whether the caller is authorized to access resource pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
 
         # Retrieve customer or respond with a 404 if no customer was found for
         # the given ID.
@@ -178,6 +186,10 @@ class ResourceSubscription(ResourceBase):
         msg = "Deleting subscription with ID '{}' for customer with ID '{}'."
         msg_fmt = msg.format(subscription_id, customer_id)
         self.logger.info(msg_fmt)
+
+        # Check whether the caller is authorized to access resource pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
 
         # Cancel subscription or respond with a 404 if no subscription was
         # found for the given ID.
