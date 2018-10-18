@@ -40,6 +40,10 @@ class ResourceClientToken(ResourceBase):
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
+        # Check whether the caller is authorized to access resources pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
+
         # Generate client-token.
         try:
             token = self.gateway.client_token.generate({

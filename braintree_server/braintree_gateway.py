@@ -5,8 +5,6 @@
 import os
 import argparse
 
-import braintree
-
 from braintree_server.config import import_config
 from braintree_server.api import create_api
 
@@ -39,16 +37,7 @@ def main(filename_config_file=None):
 
     cfg = load_config(filename_config_file=filename_config_file)
 
-    gateway = braintree.BraintreeGateway(
-        braintree.Configuration(
-            environment=cfg.braintree.environment,
-            merchant_id=cfg.braintree.merchant_id,
-            public_key=cfg.braintree.public_key,
-            private_key=cfg.braintree.private_key,
-        )
-    )
-
-    api = create_api(gateway=gateway, logger_level=cfg.logger_level)
+    api = create_api(cfg=cfg, logger_level=cfg.logger_level)
 
     return api
 

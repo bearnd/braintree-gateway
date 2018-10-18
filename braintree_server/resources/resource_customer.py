@@ -43,11 +43,15 @@ class ResourceCustomer(ResourceBase):
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
+        # Check whether the caller is authorized to access resources pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
+
         # Retrieve customer or respond with a 404 if no customer was found for
         # the given ID.
         try:
             customer = self.gateway.customer.find(customer_id=customer_id)
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg_fmt = "Customer with ID '{}' not found.".format(customer_id)
             self.logger.exception(msg_fmt)
 
@@ -87,6 +91,10 @@ class ResourceCustomer(ResourceBase):
         msg = "Creating customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
+
+        # Check whether the caller is authorized to access resources pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
 
         # Create a new customer.
         result = self.gateway.customer.create(params={
@@ -137,11 +145,15 @@ class ResourceCustomer(ResourceBase):
         msg_fmt = msg.format(customer_id)
         self.logger.info(msg_fmt)
 
+        # Check whether the caller is authorized to access resource pertaining
+        # to the given customer.
+        self.check_auth(req=req, customer_id=customer_id)
+
         # Delete customer or respond with a 404 if no customer was found for
         # the given ID.
         try:
             result = self.gateway.customer.delete(customer_id=customer_id)
-        except braintree.exceptions.NotFoundError as exc:
+        except braintree.exceptions.NotFoundError:
             msg_fmt = "Customer with ID '{}' not found.".format(customer_id)
             self.logger.exception(msg_fmt)
 
