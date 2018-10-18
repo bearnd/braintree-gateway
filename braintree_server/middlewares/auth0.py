@@ -197,7 +197,19 @@ class MiddlewareAuth0(object):
         # Validate the authorization header and retrieve the token.
         token = self._get_token(req=req)
 
-        unverified_header = jwt.get_unverified_header(token)
+        # Retrieve the token header and raise a 401 if the token is malformed
+        # and the header can't be retrieved.
+        try:
+            unverified_header = jwt.get_unverified_header(token)
+        except Exception:
+            msg_fmt = "'Authorization' token is malformed."
+            self.logger.exception(msg_fmt)
+
+            raise falcon.HTTPError(
+                status=falcon.HTTP_401,
+                title="Malformed 'Authorization' token.",
+                description=msg_fmt,
+            )
 
         # Assemble the RSA key.
         rsa_key = {}
