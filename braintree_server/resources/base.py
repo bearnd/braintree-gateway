@@ -40,6 +40,53 @@ class ResourceBase(object):
             logger_level=kwargs.get("logger_level", "DEBUG")
         )
 
+    def check_auth(
+        self,
+        req: falcon.Request,
+        customer_id: str
+    ):
+        """ Checks whether the access-token provided in the request
+            authorizes the caller to access resources pertaining to a specific
+            customer.
+
+        Note:
+            As in service-to-service requests there is not user ID in the
+            access-token, any requests where the access-token contains a  `sub`
+            including the API's `client_id` (provided during  instantiation)
+            are considered authorized.
+
+        Args:
+            req (falcon.Request): The Falcon `Request` object.
+            customer_id (str): The customer ID against which the check is
+                performed.
+
+        Raises:
+            falcon.HTTPError: Raised with a 403 response if the incoming
+                request is unathorized.
+        """
+
+        # Retrieve the decoded token payload from the request context.
+        token_payload = req.context["token_payload"]
+
+        # If the value of the token `sub` field does not contain either the
+        # provided `customer_id` or the configured `client_id` (used in
+        # service-to-service requests) then the response is authorized hence
+        # a 403 exception is raised.
+        if (
+            customer_id not in token_payload["sub"] and
+            self.cfg.auth0.client_id not in token_payload["sub"]
+        ):
+            msg = ("'Authorization' token does not grant access to customer "
+                   "with ID '{}'.")
+            msg_fmt = msg.format(customer_id)
+            self.logger.error(msg_fmt)
+
+            raise falcon.HTTPError(
+                status=falcon.HTTP_403,
+                title="Unathorized.",
+                description=msg_fmt,
+            )
+
     def get_parameters(
         self,
         req: falcon.Request,
