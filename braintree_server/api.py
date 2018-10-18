@@ -73,25 +73,38 @@ def create_api(
     # Add the route used to ping the service.
     api.add_route(
         uri_template="/ping",
-        resource=ResourcePing(gateway=gateway, logger_level=logger_level),
+        resource=ResourcePing(
+            cfg=cfg,
+            gateway=gateway,
+            logger_level=logger_level,
+        ),
     )
 
     # Add the route used to retrieve (GET) or delete (DELETE) customers.
     api.add_route(
         uri_template="/customer/{customer_id}",
-        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level),
+        resource=ResourceCustomer(
+            cfg=cfg,
+            gateway=gateway,
+            logger_level=logger_level,
+        ),
     )
 
     # Add the route used to create (POST) customers.
     api.add_route(
         uri_template="/customer",
-        resource=ResourceCustomer(gateway=gateway, logger_level=logger_level),
+        resource=ResourceCustomer(
+            cfg=cfg,
+            gateway=gateway,
+            logger_level=logger_level,
+        ),
     )
 
     # Add the route used to retrieve (GET) or delete (DELETE) subscriptions.
     api.add_route(
         uri_template="/subscription/{subscription_id}",
         resource=ResourceSubscription(
+            cfg=cfg,
             gateway=gateway,
             logger_level=logger_level,
         ),
@@ -101,6 +114,7 @@ def create_api(
     api.add_route(
         uri_template="/subscription",
         resource=ResourceSubscription(
+            cfg=cfg,
             gateway=gateway,
             logger_level=logger_level,
         )
@@ -110,6 +124,7 @@ def create_api(
     api.add_route(
         uri_template="/client-token",
         resource=ResourceClientTokenNoCustomerId(
+            cfg=cfg,
             gateway=gateway,
             logger_level=logger_level,
         ),
@@ -119,6 +134,7 @@ def create_api(
     api.add_route(
         uri_template="/client-token/{customer_id}",
         resource=ResourceClientToken(
+            cfg=cfg,
             gateway=gateway,
             logger_level=logger_level,
         ),
