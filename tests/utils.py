@@ -17,7 +17,6 @@ class JwtTokenGenerator(object):
     """ Class meant to generate Auth0 access-tokens used in unit-testing."""
 
     _token = None
-    _token_expiry = None
 
     def __init__(
         self,
