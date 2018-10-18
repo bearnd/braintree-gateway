@@ -102,7 +102,7 @@ def create_api(
 
     # Add the route used to retrieve (GET) or delete (DELETE) subscriptions.
     api.add_route(
-        uri_template="/subscription/{subscription_id}",
+        uri_template="/customer/{customer_id}/subscription/{subscription_id}",
         resource=ResourceSubscription(
             cfg=cfg,
             gateway=gateway,
@@ -112,7 +112,7 @@ def create_api(
 
     # Add the route used to create (POST) subscriptions.
     api.add_route(
-        uri_template="/subscription",
+        uri_template="/customer/{customer_id}/subscription",
         resource=ResourceSubscription(
             cfg=cfg,
             gateway=gateway,

@@ -29,6 +29,7 @@ class ResourceSubscription(ResourceBase):
         self,
         req: falcon.Request,
         resp: falcon.Response,
+        customer_id: str,
         subscription_id: str,
     ):
         """ Retrieves an existing Braintree subscription via their ID.
@@ -36,12 +37,14 @@ class ResourceSubscription(ResourceBase):
         Args:
             req (falcon.Request): The Falcon `Request` object.
             resp (falcon.Response): The Falcon `Response` object.
+            customer_id (str): The Braintree customer ID for which retrieval
+                will be performed.
             subscription_id (str): The Braintree subscription ID for which
                 retrieval will be performed.
         """
 
-        msg = "Retrieving subscription with ID '{}'."
-        msg_fmt = msg.format(subscription_id)
+        msg = "Retrieving subscription with ID '{}' for customer with ID '{}'."
+        msg_fmt = msg.format(subscription_id, customer_id)
         self.logger.info(msg_fmt)
 
         # Retrieve subscription or respond with a 404 if no subscription was
@@ -72,6 +75,7 @@ class ResourceSubscription(ResourceBase):
         self,
         req: falcon.Request,
         resp: falcon.Response,
+        customer_id: str
     ):
         """ Creates a new Braintree payment-method and subscription to a given
             plan.
@@ -79,15 +83,14 @@ class ResourceSubscription(ResourceBase):
         Args:
             req (falcon.Request): The Falcon `Request` object.
             resp (falcon.Response): The Falcon `Response` object.
+            customer_id (str): The Braintree customer ID for which creation
+                will be performed.
         """
 
         parameters = self.get_parameters(
             req=req,
             schema=self.schema_post_request,
         )
-
-        # Retrieve the customer ID.
-        customer_id = parameters["customer_id"]
 
         msg = "Creating subscription for customer with ID '{}'."
         msg_fmt = msg.format(customer_id)
@@ -158,6 +161,7 @@ class ResourceSubscription(ResourceBase):
         self,
         req: falcon.Request,
         resp: falcon.Response,
+        customer_id: str,
         subscription_id: str,
     ):
         """ Cancels a Braintree subscription.
@@ -165,12 +169,14 @@ class ResourceSubscription(ResourceBase):
         Args:
             req (falcon.Request): The Falcon `Request` object.
             resp (falcon.Response): The Falcon `Response` object.
+            customer_id (str): The Braintree customer ID for which cancellation
+                will be performed.
             subscription_id (str): The Braintree subscription ID for which
                 cancellation will be performed.
         """
 
-        msg = "Deleting subscription with ID '{}'."
-        msg_fmt = msg.format(subscription_id)
+        msg = "Deleting subscription with ID '{}' for customer with ID '{}'."
+        msg_fmt = msg.format(subscription_id, customer_id)
         self.logger.info(msg_fmt)
 
         # Cancel subscription or respond with a 404 if no subscription was
