@@ -17,6 +17,7 @@ import requests
 
 from braintree_server.loggers import create_logger
 from braintree_server.excs import Auth0JwksRetrievalError
+from braintree_server.middlewares.cors import MiddlewareCors
 
 
 class MiddlewareAuth0(object):
@@ -189,6 +190,12 @@ class MiddlewareAuth0(object):
             req (falcon.Request): The Falcon `Request` object.
             resp (falcon.Response): The Falcon `Response` object.
         """
+
+        # Skip the authentication check if the current request is a CORS
+        # OPTIONS request. The actual handling of the request will be handled
+        # via the `MiddlewareCors` class.
+        if MiddlewareCors.is_req_cors(req=req):
+            return None
 
         # Skip the authentication check if the current path has been excluded.
         if self._is_path_excluded(req.path):
