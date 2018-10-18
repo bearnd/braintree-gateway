@@ -1,10 +1,12 @@
 # coding=utf-8
 
+import json
+from typing import Optional, Dict
+
+import attrdict
 import braintree
 import falcon
 import marshmallow
-import json
-from typing import Optional, Dict
 
 from braintree_server.loggers import create_logger
 
@@ -12,16 +14,24 @@ from braintree_server.loggers import create_logger
 class ResourceBase(object):
     """ Falcon resource base-class."""
 
-    def __init__(self, gateway: braintree.BraintreeGateway, **kwargs):
+    def __init__(
+        self,
+        cfg: attrdict.AttrDict,
+        gateway: braintree.BraintreeGateway,
+        **kwargs
+    ):
         """Constructor.
 
         Args:
+            cfg (attrdict.Attrdict): The application configuration loaded with
+                the methods under the `config.py` module.
             gateway (braintree.BraintreeGateway): The instantiated and
                 configured Braintree gateway that will be used to interact with
                 Braintree.
         """
 
         # Internalize arguments.
+        self.cfg = cfg
         self.gateway = gateway
 
         # Create a class-level logger.
