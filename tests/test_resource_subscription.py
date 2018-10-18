@@ -26,7 +26,10 @@ class TestResourceSubscription(TestBase):
             new=staticmethod(lambda subscription_id: fixtures.subscription),
         ):
             response = self.simulate_get(
-                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                path="/customer/{}/subscription/{}".format(
+                    fixtures.CUSTOMER_ID,
+                    fixtures.SUBSCRIPTION_ID,
+                ),
                 headers=self.generate_jwt_headers(),
             )  # type: falcon.testing.Result
 
@@ -50,7 +53,10 @@ class TestResourceSubscription(TestBase):
             side_effect=braintree.exceptions.NotFoundError,
         ):
             response = self.simulate_get(
-                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                path="/customer/{}/subscription/{}".format(
+                    fixtures.CUSTOMER_ID,
+                    fixtures.SUBSCRIPTION_ID,
+                ),
                 headers=self.generate_jwt_headers(),
             )
 
@@ -75,7 +81,7 @@ class TestResourceSubscription(TestBase):
             ),
         ):
             response = self.simulate_post(
-                path="/subscription",
+                path="/customer/{}/subscription".format(fixtures.CUSTOMER_ID),
                 body=json.dumps({
                     "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
                     "customer_id": fixtures.CUSTOMER_ID,
@@ -105,7 +111,7 @@ class TestResourceSubscription(TestBase):
             side_effect=braintree.exceptions.NotFoundError,
         ):
             response = self.simulate_post(
-                path="/subscription",
+                path="/customer/{}/subscription".format(fixtures.CUSTOMER_ID),
                 body=json.dumps({
                     "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
                     "customer_id": fixtures.CUSTOMER_ID,
@@ -131,7 +137,7 @@ class TestResourceSubscription(TestBase):
         """
 
         response = self.simulate_post(
-            path="/subscription",
+            path="/customer/{}/subscription".format(fixtures.CUSTOMER_ID),
             body=json.dumps({
                 "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
                 "customer_id": fixtures.CUSTOMER_ID,
@@ -163,7 +169,7 @@ class TestResourceSubscription(TestBase):
             ),
         ):
             response = self.simulate_post(
-                path="/subscription",
+                path="/customer/{}/subscription".format(fixtures.CUSTOMER_ID),
                 body=json.dumps({
                     "payment_method_nonce": fixtures.PAYMENT_METHOD_NONCE,
                     "customer_id": fixtures.CUSTOMER_ID,
@@ -183,7 +189,10 @@ class TestResourceSubscription(TestBase):
             new=staticmethod(lambda subscription_id: fixtures.result_success),
         ):
             response = self.simulate_delete(
-                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                path="/customer/{}/subscription/{}".format(
+                    fixtures.CUSTOMER_ID,
+                    fixtures.SUBSCRIPTION_ID,
+                ),
                 headers=self.generate_jwt_headers(),
             )
 
@@ -198,7 +207,10 @@ class TestResourceSubscription(TestBase):
             side_effect=braintree.exceptions.NotFoundError,
         ):
             response = self.simulate_delete(
-                path="/subscription/{}".format(fixtures.SUBSCRIPTION_ID),
+                path="/customer/{}/subscription/{}".format(
+                    fixtures.CUSTOMER_ID,
+                    fixtures.SUBSCRIPTION_ID,
+                ),
                 headers=self.generate_jwt_headers(),
             )
 
