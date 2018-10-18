@@ -5,6 +5,7 @@ import falcon
 import braintree
 
 from braintree_server.loggers import create_logger
+from braintree_server.middlewares.auth0 import MiddlewareCors
 from braintree_server.middlewares.auth0 import MiddlewareAuth0
 from braintree_server.resources.resource_ping import ResourcePing
 from braintree_server.resources.resource_customer import ResourceCustomer
@@ -51,6 +52,9 @@ def create_api(
     # Create the API.
     api = falcon.API(
         middleware=[
+            # Instantiate and add the CORS middleware.
+            MiddlewareCors(logger_level=logger_level),
+            # Instantiate and add the Auth0 authentication middleware.
             MiddlewareAuth0(
                 auth0_domain=cfg.auth0.domain,
                 auth0_audience=cfg.auth0.audience,
