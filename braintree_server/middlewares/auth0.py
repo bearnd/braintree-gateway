@@ -223,7 +223,7 @@ class MiddlewareAuth0(object):
                 )
             except jwt.ExpiredSignatureError:
                 msg_fmt = "'Authorization' token has expired."
-                self.logger.error(msg_fmt)
+                self.logger.exception(msg_fmt)
 
                 raise falcon.HTTPError(
                     status=falcon.HTTP_401,
@@ -232,7 +232,7 @@ class MiddlewareAuth0(object):
                 )
             except Exception:
                 msg_fmt = "'Authorization' header is invalid."
-                self.logger.error(msg_fmt)
+                self.logger.exception(msg_fmt)
 
                 raise falcon.HTTPError(
                     status=falcon.HTTP_401,
