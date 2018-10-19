@@ -81,7 +81,7 @@ class MiddlewareAuth0(object):
         response = requests.get(url=self.auth0_jwks_url)
 
         if response.ok:
-            jwks = json.loads(response.content)
+            jwks = response.json()
         else:
             msg = "Could not retrieve the Auth0 JSON Web Key Set from URL '{}'"
             msg_fmt = msg.format(self.auth0_jwks_url)
