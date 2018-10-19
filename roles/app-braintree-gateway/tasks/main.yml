@@ -93,7 +93,7 @@
 
 - name: Checkout the project source code from Git (Production)
   git:
-    repo: "ssh://git@sunny.diskstation.me/bearnd/braintree-gateway.git"
+    repo: "ssh://git@sunny.diskstation.me:30001/bearnd/braintree-gateway.git"
     dest: "{{ system.directories.share }}/src"
     depth: 1
     force: yes
