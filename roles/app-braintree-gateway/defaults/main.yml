@@ -5,7 +5,7 @@ dependencies:
     - git
     - htop
     - build-essential
-    - python3.6-dev
+    - python3-dev
     - python-pip
     - python3-pip
     - libxslt1-dev
