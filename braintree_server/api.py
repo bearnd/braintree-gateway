@@ -59,12 +59,10 @@ def create_api(
                 auth0_domain=cfg.auth0.domain,
                 auth0_audience=cfg.auth0.audience,
                 auth0_jwks_url=cfg.auth0.jwks_url,
-                exlcude=[
-                    "/ping",
-                ],
+                exlcude=["/ping"],
                 logger_level=logger_level,
             ),
-        ]
+        ],
     )
 
     msg_fmt = u"Initializing API resources."
