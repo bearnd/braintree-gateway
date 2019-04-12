@@ -56,7 +56,7 @@
     name: "{{ item }}"
     state: latest
     virtualenv: "{{ system.directories.virtual_env }}"
-    virtualenv_python: python3.6
+    virtualenv_python: python3.5
   with_items: "{{ dependencies.pip.virtualenv }}"
   become: true
   become_user: "{{ system.user }}"
@@ -159,7 +159,7 @@
     requirements: requirements_dev.txt
     state: latest
     virtualenv: "{{ system.directories.virtual_env }}"
-    virtualenv_python: python3.6
+    virtualenv_python: python3.5
   when: is_vagrant is defined and is_vagrant == True
   become: true
   become_user: "{{ system.user }}"
@@ -170,7 +170,7 @@
     requirements: requirements.txt
     state: latest
     virtualenv: "{{ system.directories.virtual_env }}"
-    virtualenv_python: python3.6
+    virtualenv_python: python3.5
   become: true
   become_user: "{{ system.user }}"
   when: is_vagrant is not defined or is_vagrant == False
