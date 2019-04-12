@@ -8,8 +8,7 @@ missing or invalid.
 """
 
 import re
-import json
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import falcon
 from jose import jwt
@@ -65,12 +64,12 @@ class MiddlewareAuth0(object):
         # Retrieve the Auth0 JWKS.
         self.jwks = self._get_jwks()
 
-    def _get_jwks(self):
+    def _get_jwks(self) -> Dict:
         """ Retrieves and JSON-decodes the Auth0 JSON Web Key Set from the URL
             defined upon instantiation.
 
         Returns:
-            dict: The retrieved and decoded Auth0 JWKS.
+            Dict: The retrieved and decoded Auth0 JWKS.
         """
 
         msg = "Retrieving the Auth0 JSON Web Key Set from URL '{}'"
@@ -90,7 +89,7 @@ class MiddlewareAuth0(object):
 
         return jwks
 
-    def _is_path_excluded(self, path):
+    def _is_path_excluded(self, path) -> bool:
         """ Checks if a given `path` matches any of the defined exclusions.
 
         Args:
