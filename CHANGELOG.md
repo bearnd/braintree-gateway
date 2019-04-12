@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.2.0
+
+- Changed the postgres port in `Vagrantfile`.
+- Minor changes to the service configuration.
+- Updated the Ansible role to work with Python 3.5.
+
 ### v0.1.2
 
 - Fixed the wrong Git URL in the Ansible role.
