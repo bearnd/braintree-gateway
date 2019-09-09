@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.2.1
+
+- Changed Gunicorn port.
+
 ### v0.2.0
 
 - Changed the postgres port in `Vagrantfile`.
