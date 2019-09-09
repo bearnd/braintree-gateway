@@ -109,7 +109,7 @@ config:
     # Gunicorn Configuration Settings.
     gunicorn:
       host: "0.0.0.0"
-      port: 8080
+      port: 5556
       workers: 1
       threads: 4
       worker_class: sync
@@ -137,7 +137,7 @@ config:
     # Gunicorn Configuration Settings.
     gunicorn:
       host: "0.0.0.0"
-      port: 8080
+      port: 5556
       workers: 1
       threads: 4
       worker_class: sync
@@ -165,7 +165,7 @@ config:
     # Gunicorn Configuration Settings.
     gunicorn:
       host: "0.0.0.0"
-      port: 8080
+      port: 5556
       workers: 4
       threads: 4
       worker_class: sync
