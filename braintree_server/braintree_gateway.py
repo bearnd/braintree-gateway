@@ -7,6 +7,7 @@ import argparse
 
 from braintree_server.config import import_config
 from braintree_server.api import create_api
+from braintree_server.sentry import initialize_sentry
 
 
 _cfg = None
@@ -36,6 +37,9 @@ def get_cfg(filename_config_file=None):
 def main(filename_config_file=None):
 
     cfg = load_config(filename_config_file=filename_config_file)
+
+    # Initialize the Sentry agent.
+    initialize_sentry(cfg=cfg)
 
     api = create_api(cfg=cfg, logger_level=cfg.logger_level)
 

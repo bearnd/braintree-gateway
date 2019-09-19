@@ -100,6 +100,17 @@ auth0_prod_client_secret: !vault |
   34666139303961663335656462653638353530323563313061343438396130656165323266646365
   33323637373330316538
 
+# Sentry variables.
+sentry_dsn: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  64653031633636346535636531376661376634383137306337376334333034333265623138623765
+  3635623661663533653530356330396265633535663036390a323130343339326664363761323733
+  34393034343333393737353836303036303164363463343162626137303933633162643636393337
+  6536336136353637350a303735356436343466336463383732646332346138623766353138353264
+  65396234623865623366323030306530666637326336353032626234663765643532333962396164
+  65323939323161373930386233653939366331666130343166383838373634333763616531653535
+  346330313633373930666138373231633632
+
 # GitLab variables.
 gitlab_deploy_token_username: "braintree-gateway-deployer"
 gitlab_deploy_token_password: !vault |
@@ -156,6 +167,10 @@ config:
       client_id: "{{ auth0_dev_client_id }}"
       client_secret: "{{ auth0_dev_client_secret }}"
 
+    # Sentry configuration settings.
+    sentry:
+      dsn:
+
   dev:
     # General Settings.
     logger_level: DEBUG
@@ -184,6 +199,10 @@ config:
       client_id: "{{ auth0_dev_client_id }}"
       client_secret: "{{ auth0_dev_client_secret }}"
 
+    # Sentry configuration settings.
+    sentry:
+      dsn:
+
   prod:
     # General Settings.
     logger_level: INFO
@@ -211,3 +230,7 @@ config:
       jwks_url: "{{ auth0_jwks_url }}"
       client_id: "{{ auth0_prod_client_id }}"
       client_secret: "{{ auth0_prod_client_secret }}"
+
+    # Sentry configuration settings.
+    sentry:
+      dsn: "{{ sentry_dsn }}"
