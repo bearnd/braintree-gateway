@@ -4,7 +4,7 @@
 
 __author__ = """Adamos Kyriakou"""
 __email__ = 'adam@bearnd.io'
-__version__ = '0.2.1'
+__version__ = '0.3.0'
 
 from braintree_server import config
 from braintree_server import excs
