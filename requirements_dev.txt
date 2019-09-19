@@ -12,3 +12,4 @@ marshmallow==2.15.6
 falcon-marshmallow==0.3.0
 python-jose-cryptodome==1.3.2
 requests==2.22.0
+sentry-sdk==0.12.0
