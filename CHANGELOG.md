@@ -1,5 +1,11 @@
 ## Changelog
 
+### v0.3.0
+
+- Story No. 1083: Port `braintree-gateway` to Python 3.7.
+- Story No. 1091: Switch `braintree-gateway` Git deployment to GitLab.com.
+- Story No. 1146: Add production Auth0 to `braintree-gateway`.
+
 ### v0.2.1
 
 - Changed Gunicorn port.
