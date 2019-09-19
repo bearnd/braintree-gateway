@@ -207,7 +207,7 @@ config:
     # Auth0 configuration settings.
     auth0:
       domain: "{{ auth0_domain }}"
-      audience: "{{ auth0_dev_audience }}"
+      audience: "{{ auth0_prod_audience }}"
       jwks_url: "{{ auth0_jwks_url }}"
       client_id: "{{ auth0_prod_client_id }}"
       client_secret: "{{ auth0_prod_client_secret }}"
