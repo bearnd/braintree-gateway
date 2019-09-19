@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.4.0
+
+- Story No. 1137: Add Sentry to `braintree-gateway`.
+
 ### v0.3.1
 
 - Changed the Auth0 audience variable for production.
