@@ -120,7 +120,7 @@ config:
       host: "0.0.0.0"
       port: 5556
       workers: 1
-      threads: 4
+      threads: 1
       worker_class: sync
       timeout: 60
 
@@ -148,7 +148,7 @@ config:
       host: "0.0.0.0"
       port: 5556
       workers: 1
-      threads: 4
+      threads: 1
       worker_class: sync
       timeout: 60
 
