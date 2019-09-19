@@ -1,5 +1,9 @@
 ## Changelog
 
+### v0.3.1
+
+- Changed the Auth0 audience variable for production.
+
 ### v0.3.0
 
 - Story No. 1083: Port `braintree-gateway` to Python 3.7.
